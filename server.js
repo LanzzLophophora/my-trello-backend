@@ -1,33 +1,49 @@
-var express = require('express');
-var bodyParser = require('body-parser');
-// var MongoClient = require('mongodb').MongoClientt;
-var ObjectID = require('mongodb').ObjectID;
-var db = require('./db');
-var usersController = require('./controllers/users');
+const express = require('express');
+const bodyParser = require('body-parser');
+const session = require('express-session');
+const morgan = require('morgan');
+const docs = require('express-mongoose-docs');
+const mongoose = require('mongoose');
+const reload = require('express-reload');
 
-var app = express();
+const config = require('./config/');
+const router = require('./routes');
+const errorHandler = require('./middlewares/errorHandler');
+const connectDatabase = require('./db');
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+connectDatabase()
+  // .on('error', () => { console.log("error") })
+  .on('disconnect', connectDatabase)
+  .once('open', runServer);
 
-app.get('/', function (req, res) {
-  res.send('Hello API');
-});
+function runServer () {
+  const app = express();
+  config.port = config.port || process.env.PORT;
+  //
+  // var path = __dirname + '/server.js';
+  // app.use(reload(path));
 
-app.get('/users', usersController.all);
-app.get('/users/:id', usersController.findById);
-
-app.post('/users', usersController.create);
-
-app.put('/users/:id', usersController.update);
-
-app.delete('/users/:id', usersController.delete);
-
-db.connect('mongodb://localhost:27017/listsdb', (err) => {
-  if (err) {
-    return console.log(err);
-  }
-  app.listen(3012, function () {
-    console.log('API app stated');
+  app.listen(config.port, function (err){
+    if (err) throw err;
+    console.log(`🏠 MY-TRELLO is up and running in ${process.env.NODE_ENV} mode at https://${config.host}:${config.port}`)
   });
-});
+
+  docs(app, mongoose);
+
+  app.get('/api', function (req, res) {
+    res.send('Hello API');
+  });
+
+  app.use(morgan('tiny'));
+  app.use(bodyParser.json());
+  app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(session({
+    resave: true,
+    saveUninitialized: true,
+    secret: config.secret
+  }));
+
+  app.use('/api', router);
+
+  app.use(errorHandler);
+}

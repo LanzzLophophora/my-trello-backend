@@ -1,0 +1,29 @@
+{
+  "host": "",
+  "port": null,
+  "frontend_host": "",
+  "mongodb": "",
+  "mongoAuthObject": null,
+  "authentication": {
+    "secret": "",
+    "strategies": [
+      "jwt",
+      "local"
+    ],
+    "jwt": {
+      "audience": "http://localhost",
+      "subject": "anonymous",
+      "issuer": "LANZZ",
+      "algorithm": "HS256",
+      "expiresIn": "48h"
+    }
+  },
+  "sentry": {
+    "dsn": null
+  },
+  "hotjar": {
+    "id": null,
+    "sv": null
+  },
+  "ga_tracking_id": null
+}

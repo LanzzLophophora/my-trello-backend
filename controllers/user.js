@@ -1,17 +1,7 @@
 const { getUserByTokenService, getUserByIdService, updateUserDataService } = require('../services/UserService');
-// const getUserByTokenService = require('../services/UserService');
-// const getUserByIdService = require('../services/UserService');
-// const updateUserDataService = require('../services/UserService');
 const User = require('../models/user');
 
 const getAllUsers = async (req, res, next) => {
-  if (!req.user.isAdmin) {
-    return next({
-      status: 403,
-      message: "Forbidden"
-    });
-  }
-
   try {
     var users = await User.find(function (err, users) {
        if (err) return console.error(err);
@@ -28,13 +18,6 @@ const getAllUsers = async (req, res, next) => {
 };
 
 const deleteUserById = async (req, res, next) => {
-  if (!req.user.isAdmin) {
-    return next({
-      status: 403,
-      message: "Forbidden"
-    });
-  }
-
   try {
     var user = await getUserByIdService(req.params.id);
   } catch ({ message }) {
@@ -59,16 +42,11 @@ const deleteUserById = async (req, res, next) => {
       message
     });
   }
+
   return res.sendStatus( 200);
 };
 
 const getUserById = async (req, res, next) => {
-  if (!req.user.isAdmin) {
-    return next({
-      status: 403,
-      message: "Forbidden"
-    });
-  }
   try {
     var user = await getUserByIdService(req.params.id);
   } catch ({ message }) {
@@ -77,11 +55,13 @@ const getUserById = async (req, res, next) => {
       message
     });
   }
+
   return res.json(user);
 };
 
 const getCurrentUser = async (req, res, next) => {
   const { token } = req;
+
   try {
     var user = await getUserByTokenService(token);
   } catch ({ message }) {
@@ -90,6 +70,7 @@ const getCurrentUser = async (req, res, next) => {
       message
     });
   }
+
   return res.json(user);
 };
 
@@ -112,42 +93,8 @@ const makeUserDisable = async (req, res, next) => {
     });
   }
 
-  // return res.send(result);
   return  res.json({ message: 'success' });
-
-
-
-  // const { login } = req.params;
-  //
-  // try {
-  //   var user = await User.findOne({ login });
-  // } catch ({ message }) {
-  //   return next({
-  //     status: 500,
-  //     message
-  //   });
-  // }
-  //
-  // if (!user) {
-  //   return next({
-  //     status: 404,
-  //     message: 'User not found'
-  //   });
-  // }
-  //
-  // try {
-  //   user.deleteOne()
-  // } catch ({ message }) {
-  //   return next({
-  //     status: 500,
-  //     message
-  //   });
-  // }
-  //
-  // return  res.json({ message: 'success' });
 };
-
-
 
 const updateUser = async (req, res, next) => {
   const newData = {

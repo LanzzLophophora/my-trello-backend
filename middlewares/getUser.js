@@ -7,10 +7,11 @@ const getUser = async (req, res, next) => {
   } catch ({ message }) {
     return next ({
       status: 500,
-      message
+      message: 'dwaddaw'
     });
   }
   req.user = user;
+
   next();
 };
 

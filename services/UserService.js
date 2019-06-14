@@ -2,13 +2,10 @@ const User = require('../models/user');
 
 getUserByTokenService = async (token) => {
   const { _id } = token;
-
   try {
     const user = await User.findOne({ _id }, {password: 0});
     if (!user) return;
-    if (!user.isAdmin) {
-      return user;
-    }
+    if (!user.isAdmin) return user;
     return await User.findOne({ _id });
   } catch (e) {
     throw e;

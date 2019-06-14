@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+
 const User = require('../models/user');
 const config = require('../config');
 
@@ -13,8 +14,8 @@ const signup = async (req, res) => {
       isAdmin: credentials.isAdmin || false,
       disable: credentials.disable || false
     };
-    const result = await User.create(newUser);
-    result && res.sendStatus(200);
+    await User.create(newUser);
+    res.sendStatus(200);
   } catch (error) {
     res.status(500).send({ error })
   }
@@ -23,14 +24,15 @@ const signup = async (req, res) => {
 const signin = async (req, res) => {
   try {
     const { login, password } = req.headers;
+    if(!login || !password) res.status(400).send({ message: "Bad credentials" });
     const user = await User.findOne({ login });
     if(!user) res.status(404).send({ message: "User not found" });
     const result = await user.comparePasswords(password);
     if(result) {
-      const token = jwt.sign({ _id: user._id }, config.secret);
-      res.status(200).json(token);
+      const token = jwt.sign({ _id: user._id }, config.authentication.secret);
+      res.status(200).send({ token });
     } else {
-      res.status(400).send({ message: "Bad Credentials" });
+      res.status(400).send({ message: "Wrong password" });
     }
   } catch (error) {
     res.status(500).send({ error })

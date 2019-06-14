@@ -32,7 +32,6 @@ router.get('/projects/:id', checkToken, getUser, getProject, ProjectController.g
 router.patch('/projects/:id', checkToken, getUser, getProject, ProjectController.updateProject);
 router.delete('/projects/:id', checkToken, getUser, getProject, ProjectController.deleteProject);
 
-                      // midlleware getProject
 
 router.get('/projects/:id/lists/', checkToken, getUser, getProject, ProjectController.getAllLists);
 router.post('/projects/:id/lists', checkToken, getUser, getProject, ProjectController.createList);
@@ -40,9 +39,5 @@ router.post('/projects/:id/lists', checkToken, getUser, getProject, ProjectContr
 router.get('/projects/:id/lists/:listId', checkToken, getUser, getProject, ProjectController.getList);
 router.patch('/projects/:id/lists/:listId', checkToken, getUser, getProject, ProjectController.updateList);
 router.delete('/projects/:id/lists/:listId', checkToken, getUser, getProject, ProjectController.deleteList);
-//
-// router.patch('/projects/:id/lists/:listId/cardList/:cardListId', checkToken, getUser, ProjectController.updateCardList);
-// router.delete('/projects/:id/lists/:listId/cardList/:cardListId', checkToken, getUser,  ProjectController.deleteCardList);
-
 
 module.exports = router;

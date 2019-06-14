@@ -1,9 +1,10 @@
 const config = {
-  database: 'mongodb://localhost:27017/listsdb',
+  database: 'mongodb://localhost:27017/my-trello-db',
   host: 'localhost',
   port: 5000,
-  secret: 'nu489c0ACMACIDc0icjiiw'
+  authentication: {
+    secret: 'nu489c0ACMACIDc0icjiiw'
+  }
 };
 
 module.exports = config;
-

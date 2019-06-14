@@ -1,4 +1,5 @@
 const Project = require('../models/project');
+
 const getProject = async (req, res, next) => {
   const { id } = req.params;
   try {
@@ -10,7 +11,7 @@ const getProject = async (req, res, next) => {
     req.project = project;
     next();
   } catch (error) {
-    res.status(500).send({ error })
+    res.status(500).send({ error });
   }
 };
 

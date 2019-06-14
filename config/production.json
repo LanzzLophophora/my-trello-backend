@@ -1,9 +1,9 @@
 {
   "host": "localhost",
   "port": 5000,
-  "mongodb": "mongodb://localhost:27017/listsdb",
+  "mongodb": "mongodb://localhost:27017/my-trello-db",
   "mongoAuthObject": null,
   "authentication": {
-    "secret": "verysecretkey"
+    "secret": "nu489c0ACMACIDc0icjiiw"
   }
 }

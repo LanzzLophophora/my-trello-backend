@@ -1,4 +1,4 @@
-const errorHandler = (err, req, res, next) => {
+const errorHandler = (err, req, res) => {
   let { status = 500, message = 'Server Error' } = err;
 
   return res

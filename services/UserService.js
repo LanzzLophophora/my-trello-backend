@@ -4,7 +4,8 @@ getUserByTokenService = async (token) => {
   const { _id } = token;
 
   try {
-    var user = await User.findOne({ _id }, {password: 0});
+    const user = await User.findOne({ _id }, {password: 0});
+    if (!user) return;
     if (!user.isAdmin) {
       return user;
     }
@@ -16,23 +17,19 @@ getUserByTokenService = async (token) => {
 
 getUserByIdService = async (_id) => {
   try {
-    var user = await User.findOne({ _id });
+    const user = await User.findOne({ _id });
+    if (!user) return;
+    return user;
   } catch (e) {
     throw e;
   }
-
-  return user;
 };
 
 updateUserDataService = async (user, newData) => {
-
   try {
-    User.findOneAndUpdate({ _id: user.id }, { ...newData }, (err) => {
-      if (err) {
-        console.error("error", err);
-        return err;
-      }
-    })
+    await user.set({...newData});
+    await user.save();
+    return user;
   } catch (e) {
     throw e;
   }

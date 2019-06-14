@@ -1,75 +1,43 @@
 const jwt = require('jsonwebtoken');
-
 const User = require('../models/user');
 const config = require('../config');
 
-const signup = async (req, res, next) => {
-  const credentials = req.body;
-
+const signup = async (req, res) => {
   try {
+    const credentials = req.body;
     const { login } = credentials;
     const user = await User.findOne({ login });
-    if (user) {
-      return next({
-        status: 409,
-        message: "This login is already used"
-      });
-    }
-  } catch ({ message }) {
-    return next({
-      status: 400,
-      message
-    });
-  }
-
-  try {
+    if (user) res.status(409).send({ message: "This login is already used" });
     const newUser = {
       ...credentials,
       isAdmin: credentials.isAdmin || false,
       disable: credentials.disable || false
     };
-    await User.create(newUser);
-  } catch ({ message }) {
-    return next({
-      status: 400,
-      message
-    });
+    const result = await User.create(newUser);
+    result && res.sendStatus(200);
+  } catch (error) {
+    res.status(500).send({ error })
   }
-
-  res.sendStatus(200);
 };
 
-const signin = async (req, res, next) => {
-  const { login, password } = req.headers;
-  console.log(req);
-
-  const user = await User.findOne({ login });
-
-  if(!user) {
-    return next({
-      status: 400,
-      message: 'User not found'
-    });
-  }
-
+const signin = async (req, res) => {
   try {
+    const { login, password } = req.headers;
+    const user = await User.findOne({ login });
+    if(!user) res.status(404).send({ message: "User not found" });
     const result = await user.comparePasswords(password);
     if(result) {
       const token = jwt.sign({ _id: user._id }, config.secret);
-      res.json(token);
+      res.status(200).json(token);
     } else {
-      return next({
-        status: 400,
-        message: 'Bad Credentials'
-      });
+      res.status(400).send({ message: "Bad Credentials" });
     }
-  } catch (e) {
-    return next({
-      status: 400,
-      message: 'Bad Credentials'
-    });
+  } catch (error) {
+    res.status(500).send({ error })
   }
 };
 
-module.exports.signin = signin;
-module.exports.signup = signup;
+module.exports = {
+  signup,
+  signin
+};

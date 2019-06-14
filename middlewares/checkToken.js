@@ -2,26 +2,16 @@ const jwt = require('jsonwebtoken');
 const config = require('../config');
 
 const checkToken = async (req, res, next) => {
-  const token = req.headers['authorization'];
-
-  if (!token) {
-    return next({
-      status: 403,
-      message: 'Forbidden. No token!'
-    })
-  }
-
   try {
-    var tokenObj = jwt.verify(token, config.secret);
-  } catch ({ message }) {
-    return next({
-      status: 400,
-      message
-    })
+    const token = req.headers['authorization'];
+    if (!token) {
+      return res.status(403).send({ message: "Forbidden. No token!" });
+    }
+    req.token = jwt.verify(token, config.secret);
+    next();
+  } catch (error) {
+    res.status(500).send({ error })
   }
-
-  req.token = tokenObj;
-  next();
 };
 
 module.exports = checkToken;

@@ -1,18 +1,15 @@
 const { getUserByTokenService } = require('../services/UserService');
 
 const getUser = async (req, res, next) => {
-  var { token } = req;
+  const { token } = req;
   try {
-    var user = await getUserByTokenService(token);
-  } catch ({ message }) {
-    return next ({
-      status: 500,
-      message: 'dwaddaw'
-    });
+    const user = await getUserByTokenService(token);
+    if (!user) res.status(404).send({ message: "Can't find user with such token" });
+    req.user = user;
+    next();
+  } catch (error) {
+    res.status(500).send({ error })
   }
-  req.user = user;
-
-  next();
 };
 
 module.exports = getUser;

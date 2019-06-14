@@ -1,143 +1,90 @@
-const { getUserByTokenService, getUserByIdService, updateUserDataService } = require('../services/UserService');
+const { getUserByIdService, updateUserDataService } = require('../services/UserService');
 const User = require('../models/user');
 
-const getAllUsers = async (req, res, next) => {
+const getAllUsers = async (req, res) => {
   try {
-    var users = await User.find(function (err, users) {
-       if (err) return console.error(err);
-       return users
-      });
-  } catch ({ message }) {
-    return next({
-      status: 500,
-      message
-    });
+    const users = await User.find();
+    users && res.status(200).send({ users });
+  } catch (error) {
+    res.status(500).send({ error })
   }
-
-  return res.json(users);
 };
 
-const deleteUserById = async (req, res, next) => {
+const deleteUserById = async (req, res) => {
   try {
-    var user = await getUserByIdService(req.params.id);
-  } catch ({ message }) {
-    return next({
-      status: 500,
-      message
-    });
+    const user = await getUserByIdService(req.params.id);
+    if (!user) {
+      return res.status(404).send({ message: "Can't find user with such id" });
+    }
+    const result = await user.deleteOne({_id: user.id });
+    result && res.sendStatus( 200);
+  } catch (error) {
+    res.status(500).send({ error })
   }
-
-  if (!user) {
-    return next({
-      status: 404,
-      message: "Not found!"
-    });
-  }
-
-  try {
-    var result = await user.deleteOne({_id: user.id });
-  } catch (e) {
-    return next({
-      status: 500,
-      message
-    });
-  }
-
-  return res.sendStatus( 200);
 };
 
-const getUserById = async (req, res, next) => {
+const getUserById = async (req, res) => {
   try {
-    var user = await getUserByIdService(req.params.id);
-  } catch ({ message }) {
-    return next({
-      status: 500,
-      message
-    });
+    const user = await getUserByIdService(req.params.id);
+    if (!user) {
+      return res.status(404).send({ message: "Can't find user with such id" });
+    }
+    res.status(200).send({ user })
+  } catch (error) {
+    res.status(500).send({ error })
   }
-
-  return res.json(user);
 };
 
-const getCurrentUser = async (req, res, next) => {
-  const { token } = req;
-
-  try {
-    var user = await getUserByTokenService(token);
-  } catch ({ message }) {
-    return next({
-      status: 500,
-      message
-    });
-  }
-
-  return res.json(user);
+const getCurrentUser = async (req, res) => {
+  return res.json(req.user);
 };
 
-const makeUserDisable = async (req, res, next) => {
-  if (req.user.isAdmin) {
-    return next({
-      status: 418,
-      message: "Негоже админу удалять свою учетку!"
-    });
-  }
-
+const makeUserDisable = async (req, res) => {
   try {
-    var result = updateUserDataService(req.user, {
-      disable: true
-    });
-  } catch ({ message }) {
-    return next({
-      status: 500,
-      message
-    });
+    if (req.user.isAdmin) {
+      return res.status(418).send({ message: "Негоже админу удалять свою учетку!" });
+    }
+    const result = updateUserDataService(req.user,{ disable: true });
+    result && res.sendStatus(200);
+  } catch (error) {
+    res.status(500).send({ error })
   }
-
-  return  res.json({ message: 'success' });
 };
 
-const updateUser = async (req, res, next) => {
-  const newData = {
-    ...req.body
-  };
-
+const updateUser = async (req, res) => {
   try {
-    var result = updateUserDataService(req.user, newData);
-  } catch ({ message }) {
-    return next({
-      status: 500,
-      message
+    const credentials = req.body;
+    const newData = {
+      ...req.user,
+      ...credentials
+    };
+    const result = await updateUserDataService(req.user, newData);
+    await req.user.save();
+    res.status(200).send({
+      result
     });
+  } catch (error) {
+    res.status(500).send({ error })
   }
-
-  return  res.send(result);
 };
 
-const updateUserById = async (req, res, next) => {
-
+const updateUserById = async (req, res) => {
   try {
-    var user = await getUserByIdService(req.params.id);
-  } catch ({ message }) {
-    return next({
-      status: 500,
-      message
+    const user = await getUserByIdService(req.params.id);
+    if (!user) {
+      return res.status(404).send({ message: "Can't find user with such id" });
+    }
+    const newData = {
+      ...req.body
+    };
+    const result = await updateUserDataService(user, newData);
+    await user.save();
+    res.status(200).send({
+      result
     });
+  } catch (error) {
+    res.status(500).send({ error })
   }
-
-  const newData = {
-    ...req.body
-  };
-
-  try {
-    var result = updateUserDataService(user, newData);
-  } catch ({ message }) {
-    return next({
-      status: 500,
-      message
-    });
-  }
-
-  return  res.send(result);
 };
 
 module.exports = {

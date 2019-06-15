@@ -9,6 +9,8 @@ const AuthController = require('../controllers/auth');
 const UserController = require('../controllers/user');
 const ProjectController = require('../controllers/project');
 
+router.get('/', (req, res) => res.status(200).json("Test page. Hello, API!"));
+
 router.post('/signup', AuthController.signup);
 router.get('/signin', AuthController.signin);
 

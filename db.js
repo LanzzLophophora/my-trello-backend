@@ -1,23 +1,13 @@
-var MongoClient = require('mongodb').MongoClient;
+const mongoose = require('mongoose');
+const bluebird = require('bluebird');
+const config = require('./config');
 
-var state = {
-  db: null
+const connectDatabase = () => {
+  mongoose.Promise = bluebird;
+  mongoose.connect(`${config.database}`, { useNewUrlParser: true }, console.log('Mongo connected'));
+  mongoose.set('useFindAndModify', false);
+  mongoose.set('useCreateIndex', true);
+  return mongoose.connection;
 };
 
-exports.connect = function (url, done) {
-  if (state.db) {
-    return done();
-  }
-
-  MongoClient.connect(url, function (err, database) {
-    if (err) {
-      return done(err);
-    }
-    state.db = database.db('listsdb');
-    done();
-  })
-};
-
-exports.get = function() {
-  return state.db
-};
+module.exports = connectDatabase;

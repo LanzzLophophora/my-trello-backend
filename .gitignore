@@ -7,7 +7,7 @@
 
 # testing
 /coverage
-./TODO.txt
+TODO.txt
 
 # production
 /build

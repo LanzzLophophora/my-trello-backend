@@ -15,7 +15,7 @@ const deleteUserById = async (req, res) => {
     const user = await getUserByIdService(req.params.id);
     if (!user) res.status(404).send({ message: "Can't find user with such id" });
     await user.deleteOne({ _id: user.id });
-    res.sendStatus( 200);
+    res.sendStatus(200);
   } catch (error) {
     res.status(500).send({ error });
   }
@@ -37,8 +37,8 @@ const getCurrentUser = async (req, res) => {
 
 const makeUserDisable = async (req, res) => {
   try {
-    if (req.user.isAdmin) res.status(418).send({ message: "Негоже админу удалять свою учетку!" });
-    const result = updateUserDataService(req.user,{ disable: true });
+    if (req.user.isAdmin) res.status(418).send({ message: 'Негоже админу удалять свою учетку!' });
+    const result = updateUserDataService(req.user, { disable: true });
     result && res.sendStatus(200);
   } catch (error) {
     res.status(500).send({ error });

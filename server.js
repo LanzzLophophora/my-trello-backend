@@ -14,13 +14,15 @@ connectDatabase()
   .on('disconnect', connectDatabase)
   .once('open', runServer);
 
-function runServer () {
+function runServer() {
   const app = express();
   config.port = config.port || process.env.PORT;
 
-  app.listen(config.port, function (err){
+  app.listen(config.port, function(err) {
     if (err) throw err;
-    console.log(`🏠 MY-TRELLO is up and running in ${process.env.NODE_ENV} mode at https://${config.host}:${config.port}`)
+    console.log(
+      `🏠 MY-TRELLO is up and running in ${process.env.NODE_ENV} mode at https://${config.host}:${config.port}`
+    );
   });
 
   docs(app, mongoose);
@@ -28,15 +30,18 @@ function runServer () {
   app.use(morgan('tiny'));
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
-  app.use(session({
-    resave: true,
-    saveUninitialized: true,
-    secret: config.authentication.secret
-  }));
-  app.use(function (req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Methods", "GET, PUT, PATCH, POST, DELETE");
-    res.header("Access-Control-Allow-Headers", "Content-Type");
+  app.use(
+    session({
+      resave: true,
+      saveUninitialized: true,
+      secret: config.authentication.secret
+    })
+  );
+  app.use(function(req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, PATCH, POST, DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Login, Password, authorization');
+    res.header('Access-Control-Allow-Credentials', 'true');
     next();
   });
 

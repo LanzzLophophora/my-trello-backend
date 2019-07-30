@@ -1,18 +1,16 @@
 const User = require('../models/user');
 
-getUserByTokenService = async (token) => {
+getUserByTokenService = async token => {
   const { _id } = token;
   try {
-    const user = await User.findOne({ _id }, {password: 0});
-    if (!user) return;
-    if (!user.isAdmin) return user;
-    return await User.findOne({ _id });
+    const user = await User.findOne({ _id }, { password: 0 });
+    if (user) return user;
   } catch (e) {
     throw e;
   }
 };
 
-getUserByIdService = async (_id) => {
+getUserByIdService = async _id => {
   try {
     const user = await User.findOne({ _id });
     if (!user) return;
@@ -24,7 +22,7 @@ getUserByIdService = async (_id) => {
 
 updateUserDataService = async (user, newData) => {
   try {
-    await user.set({...newData});
+    await user.set({ ...newData });
     await user.save();
     return user;
   } catch (e) {
